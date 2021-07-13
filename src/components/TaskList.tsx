@@ -10,20 +10,62 @@ interface Task {
   isComplete: boolean;
 }
 
+function findAndEnsureTask(tasklist: Task[], id: number): Task {
+  
+  function validaID(task: Task) {
+    return task.id === id
+  };
+
+  const task = tasklist.find(validaID)
+
+  if (typeof task === 'undefined') throw new TypeError('Erro, isso não é uma task!!!')
+
+  return task
+}
+
 export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
   function handleCreateNewTask() {
     // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
+
+    if (newTaskTitle.trim() === "") {
+      alert("Favor digitar um nome para task!")
+      return
+    }
+
+    const task: Task = {
+      id: Math.random(),
+      title: newTaskTitle,
+      isComplete: false
+    }
+
+    setTasks([...tasks, task])
+
+    setNewTaskTitle('')
   }
 
   function handleToggleTaskCompletion(id: number) {
     // Altere entre `true` ou `false` o campo `isComplete` de uma task com dado ID
+    const clonedTasks = [...tasks]
+
+    const task: Task = findAndEnsureTask(clonedTasks, id)
+
+    task.isComplete = task.isComplete === true ? false : true
+
+    setTasks(clonedTasks)
   }
 
   function handleRemoveTask(id: number) {
     // Remova uma task da listagem pelo ID
+    let clonedTasks = [...tasks]
+    const task: Task = findAndEnsureTask(clonedTasks, id)
+    const taskIndex = clonedTasks.indexOf(task)
+
+    clonedTasks.splice(taskIndex,1)
+
+    setTasks(clonedTasks)
   }
 
   return (
